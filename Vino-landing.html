@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vino — מערכת הניהול שמסעדות מובילות בוחרות</title>
+<meta name="description" content="Vino — 15 מודולים מקצועיים, מערכת אחת, שליטה מוחלטת. מתפריט דיגיטלי ועד AI ומועדון לקוחות.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+  :root{--orange:#FF5722;--coral:#E63946;--gold:#FFB627;--pink:#FF006E;--teal:#06B6A4;--cream:#FFF8F0;--ink:#0F0F1E;--ink2:#1A1A2E}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;font-family:'Heebo',system-ui,sans-serif;background:var(--cream);color:var(--ink);scroll-behavior:smooth}
+  body{overflow-x:hidden}
+  .font-display{font-weight:900;letter-spacing:-0.02em;line-height:1.05}
+  .grain{position:fixed;inset:0;pointer-events:none;opacity:.03;z-index:1;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.9'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>")}
+  .gradient-text{background:linear-gradient(90deg,#FF5722,#E63946,#FF006E);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% 100%;animation:shimmer 6s linear infinite}
+  @keyframes shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+  .blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;pointer-events:none;z-index:0}
+  .float{animation:float 8s ease-in-out infinite}
+  .float2{animation:float 10s ease-in-out infinite 1s}
+  .float3{animation:float 12s ease-in-out infinite 2s}
+  @keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-22px) rotate(3deg)}}
+  .pulse-ring{position:absolute;inset:0;border-radius:50%;background:#25D366;opacity:.7;animation:pulse-ring 2s cubic-bezier(.66,0,0,1) infinite}
+  @keyframes pulse-ring{0%{transform:scale(.95);opacity:.7}80%,100%{transform:scale(1.6);opacity:0}}
+  .marquee-wrap{overflow:hidden;width:100%;position:relative}
+  .marquee-wrap::before,.marquee-wrap::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none}
+  .marquee-wrap::before{left:0;background:linear-gradient(to right,#0F0F1E,transparent)}
+  .marquee-wrap::after{right:0;background:linear-gradient(to left,#0F0F1E,transparent)}
+  .marquee-track{display:flex;width:max-content;animation:marquee-scroll 35s linear infinite;will-change:transform}
+  .marquee-track:hover{animation-play-state:paused}
+  .marquee-group{display:flex;align-items:center;gap:48px;padding-left:48px;flex-shrink:0;white-space:nowrap}
+  @keyframes marquee-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .module-card{transition:box-shadow .35s ease,border-color .35s ease;transform-style:preserve-3d;perspective:1200px;will-change:transform}
+  .module-card:hover{box-shadow:0 20px 50px -20px rgba(255,87,34,.35);transform:none}
+  .module-card:hover .module-icon{transform:rotate(-8deg) scale(1.15)}
+  .module-card:hover .module-icon-bg{transform:scale(1.3) rotate(15deg)}
+  .module-icon{transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+  .module-icon-bg{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+  .badge-float{position:absolute;background:#fff;border-radius:18px;padding:12px 16px;box-shadow:0 12px 35px -10px rgba(0,0,0,.25);display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px;z-index:5}
+  .squiggle{position:relative;display:inline-block}
+  .squiggle::after{content:'';position:absolute;left:-4px;right:-4px;bottom:-6px;height:10px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10'><path d='M0,5 Q25,0 50,5 T100,5' fill='none' stroke='%23FFB627' stroke-width='4' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-size:100% 100%}
+  .scroll-cue{animation:bounce 2s ease-in-out infinite}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
+  .reveal-up{opacity:0;transform:translateY(40px)}
+  .reveal-scale{opacity:0;transform:scale(.85)}
+  .reveal-left{opacity:0;transform:translateX(-40px)}
+  .reveal-right{opacity:0;transform:translateX(40px)}
+  .dotted-bg{background-image:radial-gradient(rgba(255,87,34,.15) 1.5px,transparent 1.5px);background-size:24px 24px}
+  .whatsapp-fab{position:fixed;bottom:24px;left:24px;z-index:80;width:64px;height:64px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px;box-shadow:0 12px 30px -8px rgba(37,211,102,.5);transition:transform .2s ease}
+  .whatsapp-fab:hover{transform:scale(1.1)}
+  .btn-primary{background:linear-gradient(135deg,#FF5722,#FF006E);color:#fff;padding:16px 30px;border-radius:14px;font-weight:700;font-size:17px;display:inline-flex;align-items:center;gap:10px;box-shadow:0 12px 30px -10px rgba(255,87,34,.55);transition:transform .2s ease,box-shadow .2s ease;border:none;cursor:pointer}
+  .btn-primary:hover{transform:translateY(-3px);box-shadow:0 18px 40px -12px rgba(255,87,34,.65)}
+  .btn-secondary{background:#fff;color:var(--ink);padding:16px 30px;border-radius:14px;font-weight:600;font-size:17px;display:inline-flex;align-items:center;gap:10px;border:2px solid var(--ink);transition:transform .2s ease,background .2s}
+  .btn-secondary:hover{background:var(--ink);color:#fff;transform:translateY(-3px)}
+  .btn-whatsapp{background:#25D366;color:#fff;padding:16px 30px;border-radius:14px;font-weight:700;font-size:17px;display:inline-flex;align-items:center;gap:10px;box-shadow:0 12px 30px -10px rgba(37,211,102,.5);transition:transform .2s ease}
+  .btn-whatsapp:hover{transform:translateY(-3px)}
+  .dashed-line{border:2px dashed rgba(255,87,34,.3);border-radius:999px}
+  .tilt{transform:rotate(-3deg)}
+  .tilt2{transform:rotate(2deg)}
+  details summary{cursor:pointer;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details[open] summary i.chev{transform:rotate(180deg)}
+  details summary i.chev{transition:transform .3s ease}
+  .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 #22c55e;animation:livepulse 1.6s infinite}
+  @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.7)}70%{box-shadow:0 0 0 10px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+  .split-word{display:inline-block;opacity:0;transform:translateY(60px) rotateZ(-8deg);will-change:transform,opacity}
+  .sun-wrap{position:absolute;top:50px;right:50px;width:160px;height:160px;pointer-events:none;z-index:1;opacity:.7}
+  .sun-core{position:absolute;inset:32%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE066 0%,#FFB627 55%,#FF8C00 100%);box-shadow:0 0 50px #FFB627,0 0 110px rgba(255,182,39,.35)}
+  .sun-rays{position:absolute;inset:0;animation:sun-spin 30s linear infinite;transform-origin:center}
+  .sun-rays svg{width:100%;height:100%;overflow:visible}
+  @keyframes sun-spin{to{transform:rotate(360deg)}}
+  .hamburger{display:none;width:44px;height:44px;border-radius:12px;background:#fff;border:2px solid var(--ink);align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;z-index:31}
+  .hamburger-bars{position:relative;width:22px;height:16px}
+  .hamburger-bars span{position:absolute;left:0;right:0;height:2.5px;background:var(--ink);border-radius:2px;transition:all .3s ease}
+  .hamburger-bars span:nth-child(1){top:0}
+  .hamburger-bars span:nth-child(2){top:7px}
+  .hamburger-bars span:nth-child(3){top:14px}
+  .mobile-menu{position:fixed;inset:0;background:linear-gradient(135deg,#0F0F1E,#1A1A2E);color:#fff;z-index:95;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;opacity:0;pointer-events:none;transition:opacity .35s ease;padding:24px}
+  .mobile-menu.open{opacity:1;pointer-events:auto}
+  .mobile-menu a{font-size:22px;font-weight:700;color:#fff;padding:10px 14px}
+  .mobile-menu .menu-cta{margin-top:20px;background:#25D366;padding:16px 28px;border-radius:14px;display:inline-flex;align-items:center;gap:10px;font-size:18px}
+  .mobile-menu .close-btn{position:absolute;top:18px;right:18px;width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.1);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .mobile-menu .menu-svc{margin-top:24px;text-align:center;opacity:.7;font-size:13px;line-height:1.6}
+  @media (max-width:768px){
+    h1.font-display{font-size:42px!important;line-height:1.1!important;letter-spacing:-.01em}
+    .blob{filter:blur(40px);opacity:.35!important}
+    .blob[style*="380px"],.blob[style*="400px"]{width:240px!important;height:240px!important}
+    .blob[style*="500px"]{width:300px!important;height:300px!important}
+    nav .hidden.md\:flex,nav .nav-cta{display:none!important}
+    .hamburger{display:flex}
+    .badge-float{font-size:10px;padding:6px 9px;gap:6px;max-width:140px}
+    .badge-float>div:first-child{width:24px!important;height:24px!important;flex-shrink:0}
+    .badge-float i{font-size:12px}
+    .module-card h3{font-size:17px;margin-bottom:6px}
+    .module-card p{font-size:13px;line-height:1.5}
+    .module-card{padding:1.1rem}
+    .btn-primary,.btn-secondary,.btn-whatsapp{width:100%;justify-content:center;padding:16px 22px;font-size:15px}
+    .sun-wrap{width:80px;height:80px;top:20px;right:14px;opacity:.55}
+    .whatsapp-fab{bottom:18px;left:18px;width:56px;height:56px;font-size:26px}
+    .marquee-track{animation-duration:28s}
+    .marquee-wrap::before,.marquee-wrap::after{width:50px}
+    section{overflow:hidden}
+    details summary{padding:18px!important;font-size:16px!important}
+    .grain{display:none}
+    .relative.h-\[520px\]{height:380px!important;margin-top:24px}
+    .w-72.h-\[460px\]{width:230px!important;height:340px!important;border-width:6px!important}
+    .reveal-up.flex.flex-wrap.items-center.gap-x-6.gap-y-2{flex-direction:column;align-items:flex-start;gap:6px!important}
+    .font-display{letter-spacing:-.005em}
+    h2.font-display{font-size:34px!important;line-height:1.15!important}
+    section.relative.overflow-hidden.pt-8{padding-top:8px}
+    .reveal-up.flex.flex-wrap.gap-4{gap:10px}
+    .inline-flex.items-center.gap-2.bg-gradient-to-r{font-size:12px}
+  }
+  @media (max-width:380px){
+    h1.font-display{font-size:36px!important}
+    .badge-float{display:none}
+    .sun-wrap{width:64px;height:64px}
+  }
+  @media (hover:none){
+    .module-card:hover{transform:none!important;box-shadow:none}
+    .module-card:hover .module-icon,.module-card:hover .module-icon-bg{transform:none}
+    .module-card:active{transform:translateY(-2px) scale(.985)!important;transition:transform .15s ease}
+    .btn-primary:active,.btn-secondary:active,.btn-whatsapp:active{transform:translateY(0) scale(.97)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+    .sun-rays{animation:none}
+  }
+  .video-showcase-wrap{position:relative;width:100%;max-width:480px;margin:0 auto}
+  .video-glow{position:absolute;inset:-40px;border-radius:60px;background:radial-gradient(circle at center,rgba(255,87,34,.4) 0%,transparent 65%);filter:blur(50px);z-index:-1;opacity:.85;animation:video-pulse 4s ease-in-out infinite;pointer-events:none}
+  @keyframes video-pulse{0%,100%{opacity:.65;transform:scale(1)}50%{opacity:.95;transform:scale(1.06)}}
+  .video-showcase{position:relative;border-radius:42px;overflow:hidden;background:#000;box-shadow:0 50px 100px -20px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06),0 0 60px rgba(255,87,34,.15);aspect-ratio:9/19.5;isolation:isolate}
+  .video-showcase video{display:block;width:100%;height:100%;object-fit:cover;border-radius:42px}
+  .video-showcase .video-placeholder{position:absolute;inset:0;background:linear-gradient(135deg,#1A1A2E 0%,#0F0F1E 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:24px;gap:14px;z-index:2}
+  .video-showcase .video-placeholder i{font-size:48px;color:#FF5722}
+  .video-showcase .video-placeholder p{font-size:14px;opacity:.7;line-height:1.5}
+  .video-corner-label{position:absolute;top:14px;left:14px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);color:#fff;font-size:11px;font-weight:700;padding:5px 10px;border-radius:8px;display:flex;align-items:center;gap:5px;z-index:3}
+  .video-corner-label .live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#22c55e}
+  @media (max-width:768px){
+    .video-showcase-wrap{max-width:340px}
+    .video-showcase{border-radius:34px}
+    .video-showcase video{border-radius:34px}
+  }
+  ::selection{background:#FF006E;color:#fff}
+  /* Language toggle */
+  .lang-toggle{display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;background:#fff;border:2px solid var(--ink);font-weight:700;font-size:11px;letter-spacing:.5px;cursor:pointer;transition:all .2s ease;color:var(--ink);flex-shrink:0;font-family:inherit}
+  .lang-toggle:hover{background:var(--ink);color:#fff;transform:translateY(-1px)}
+  .mobile-menu .lang-toggle{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.3);width:auto;height:auto;padding:10px 22px;font-size:14px}
+  .mobile-menu .lang-toggle:hover{background:#fff;color:var(--ink)}
+  @media (max-width:768px){.lang-toggle{width:38px;height:38px;font-size:10px}}
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<a href="https://wa.me/972501234567?text=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A0%D7%99%20%D7%9E%D7%A2%D7%95%D7%A0%D7%99%D7%99%D7%9F%20%D7%91-Vino" target="_blank" class="whatsapp-fab" aria-label="שלח הודעת וואטסאפ">
+  <div class="pulse-ring"></div>
+  <i class="ti ti-brand-whatsapp relative z-10"></i>
+</a>
+
+<nav class="relative z-30 max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#FF5722] to-[#FF006E] flex items-center justify-center text-white font-black text-xl shadow-lg shadow-orange-500/30">V</div>
+    <div>
+      <div class="font-black text-lg leading-none">Vino</div>
+      <div class="text-xs text-gray-500 leading-none mt-1">ניהול מסעדות</div>
+    </div>
+  </div>
+  <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+    <a href="#modules" class="hover:text-[#FF5722] transition">המודולים</a>
+    <a href="#how" class="hover:text-[#FF5722] transition">איך זה עובד</a>
+    <a href="#proof" class="hover:text-[#FF5722] transition">לקוחות</a>
+    <a href="#faq" class="hover:text-[#FF5722] transition">שאלות</a>
+  </div>
+  <a href="https://wa.me/972501234567" target="_blank" class="btn-primary text-sm nav-cta" style="padding:12px 20px;font-size:14px;">
+    <i class="ti ti-brand-whatsapp"></i>
+    דברו איתנו
+  </a>
+  <button class="lang-toggle" onclick="toggleLanguage()" aria-label="Switch language">EN</button>
+  <button class="hamburger" aria-label="פתח תפריט">
+    <span class="hamburger-bars"><span></span><span></span><span></span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobile-menu">
+  <button class="close-btn" aria-label="סגור תפריט"><i class="ti ti-x" style="font-size:24px"></i></button>
+  <a href="#modules">המודולים</a>
+  <a href="#how">איך זה עובד</a>
+  <a href="#proof">לקוחות</a>
+  <a href="#faq">שאלות נפוצות</a>
+  <a href="https://wa.me/972501234567?text=%D7%94%D7%99%D7%99%2C%20%D7%A8%D7%95%D7%A6%D7%94%20%D7%9C%D7%93%D7%91%D7%A8%20%D7%A2%D7%9C%20Vino" target="_blank" class="menu-cta">
+    <i class="ti ti-brand-whatsapp" style="font-size:24px"></i>
+    דברו איתנו
+  </a>
+  <button class="lang-toggle" onclick="toggleLanguage()" aria-label="Switch language">EN</button>
+  <div class="menu-svc">☀️ מענה אנושי בקיץ הזה<br>08:00 – 00:00 · א'–ו'</div>
+</div>
+
+<section class="relative overflow-hidden pt-8 pb-20 md:pb-32" id="hero">
+  <div class="blob float" style="background:#FFB627;width:380px;height:380px;top:-100px;left:-100px"></div>
+  <div class="blob float2" style="background:#FF006E;width:300px;height:300px;top:200px;right:-100px;opacity:.35"></div>
+  <div class="blob float3" style="background:#06B6A4;width:260px;height:260px;bottom:-100px;left:30%;opacity:.25"></div>
+  <div class="sun-wrap" aria-hidden="true">
+    <div class="sun-rays">
+      <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#FFB627" stroke-width="3" stroke-linecap="round" fill="none">
+          <line x1="80" y1="6" x2="80" y2="26"/><line x1="80" y1="134" x2="80" y2="154"/>
+          <line x1="6" y1="80" x2="26" y2="80"/><line x1="134" y1="80" x2="154" y2="80"/>
+          <line x1="28" y1="28" x2="42" y2="42"/><line x1="118" y1="118" x2="132" y2="132"/>
+          <line x1="28" y1="132" x2="42" y2="118"/><line x1="118" y1="42" x2="132" y2="28"/>
+        </g>
+        <g stroke="#FFB627" stroke-width="2" stroke-linecap="round" fill="none" opacity=".6">
+          <line x1="55" y1="9" x2="58" y2="22"/><line x1="105" y1="9" x2="102" y2="22"/>
+          <line x1="55" y1="151" x2="58" y2="138"/><line x1="105" y1="151" x2="102" y2="138"/>
+          <line x1="9" y1="55" x2="22" y2="58"/><line x1="9" y1="105" x2="22" y2="102"/>
+          <line x1="151" y1="55" x2="138" y2="58"/><line x1="151" y1="105" x2="138" y2="102"/>
+        </g>
+      </svg>
+    </div>
+    <div class="sun-core"></div>
+  </div>
+
+  <div class="relative max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+    <div>
+      <div class="reveal-up inline-flex items-center gap-2 bg-gradient-to-r from-yellow-100 to-orange-100 backdrop-blur border border-orange-300 rounded-full px-4 py-2 text-sm font-bold mb-6">☀️ מתכוננים לקיץ · עונת השיא מתחילה</div>
+      <h1 class="font-display text-5xl md:text-7xl mb-6" id="hero-h1">
+        כל המסעדה שלך.<br>
+        <span class="gradient-text">במערכת אחת.</span><br>
+        <span class="squiggle">בעברית.</span>
+      </h1>
+      <p class="reveal-up text-lg md:text-xl text-gray-700 mb-8 leading-relaxed max-w-xl">
+        Vino — <strong>15 מודולים מקצועיים</strong> שמחליפים את כל המערכות שאתם משלמים עליהן היום. מתפריט דיגיטלי, דרך מועדון לקוחות, ועד AI שכותב לכם את התוכן השיווקי.<br>
+        <span class="font-bold text-[#FF5722]">🌴 קיץ 2026 כבר כאן — אל תכנסו לעונה לא מוכנים.</span>
+      </p>
+      <div class="reveal-up flex flex-wrap gap-4 mb-10">
+        <a href="https://wa.me/972501234567?text=%D7%94%D7%99%D7%99%2C%20%D7%A8%D7%95%D7%A6%D7%94%20%D7%93%D7%9E%D7%95%20%D7%A9%D7%9C%20Vino%20%D7%9C%D7%A7%D7%99%D7%A5%202026" target="_blank" class="btn-whatsapp">
+          <i class="ti ti-brand-whatsapp text-2xl"></i>
+          תפסו מקום לקיץ 2026
+        </a>
+        <a href="#modules" class="btn-secondary">
+          ראו את כל המודולים
+          <i class="ti ti-arrow-left"></i>
+        </a>
+      </div>
+      <div class="reveal-up flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-700">
+        <div class="flex items-center gap-2"><i class="ti ti-sun text-orange-500 text-lg"></i> <strong>מוכנים לקיץ</strong> תוך 48 שעות</div>
+        <div class="flex items-center gap-2"><i class="ti ti-headset text-green-600 text-lg"></i> מענה אנושי 08:00–00:00</div>
+        <div class="flex items-center gap-2"><i class="ti ti-brand-whatsapp text-green-600 text-lg"></i> וואטסאפ + טלפון</div>
+      </div>
+    </div>
+
+    <div class="relative h-[520px] reveal-scale">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-[460px] bg-white rounded-[40px] shadow-2xl border-8 border-gray-900 tilt overflow-hidden">
+        <div class="bg-gradient-to-br from-[#FF5722] via-[#E63946] to-[#FF006E] h-full p-5 text-white">
+          <div class="text-xs opacity-80 mb-1">פאנל ניהול</div>
+          <div class="font-black text-xl mb-4">שלום, שף 👋</div>
+          <div class="bg-white/15 backdrop-blur rounded-2xl p-4 mb-3">
+            <div class="text-xs opacity-90">הזמנות היום</div>
+            <div class="font-black text-3xl" id="hero-counter1">247</div>
+            <div class="text-xs opacity-80 mt-1">▲ 18% מאתמול</div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <div class="bg-white/15 rounded-xl p-3"><div class="text-[10px] opacity-80">הכנסות</div><div class="font-bold text-lg">₪14,820</div></div>
+            <div class="bg-white/15 rounded-xl p-3"><div class="text-[10px] opacity-80">לקוחות חדשים</div><div class="font-bold text-lg">38</div></div>
+          </div>
+          <div class="bg-white/15 rounded-2xl p-3">
+            <div class="flex justify-between text-[11px] opacity-90 mb-2"><span>גרף השעה האחרונה</span><span>חי</span></div>
+            <svg viewBox="0 0 200 60" class="w-full h-14">
+              <polyline points="0,40 25,30 50,35 75,15 100,25 125,10 150,20 175,8 200,15" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="0,40 25,30 50,35 75,15 100,25 125,10 150,20 175,8 200,15 200,60 0,60" fill="rgba(255,255,255,.2)"/>
+            </svg>
+          </div>
+          <div class="mt-3 grid grid-cols-3 gap-2 text-center text-[10px]">
+            <div class="bg-white/15 rounded-lg p-2"><i class="ti ti-shopping-cart"></i><div>הזמנות</div></div>
+            <div class="bg-white/15 rounded-lg p-2"><i class="ti ti-users"></i><div>מועדון</div></div>
+            <div class="bg-white/15 rounded-lg p-2"><i class="ti ti-star"></i><div>ביקורות</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="badge-float float top-4 right-2">
+        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center"><i class="ti ti-check text-green-600"></i></div>
+        <div><div class="text-xs text-gray-500">הזמנה חדשה</div><div>שולחן 4 · ₪148</div></div>
+      </div>
+      <div class="badge-float float2 bottom-4 left-2">
+        <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center"><i class="ti ti-star text-yellow-500"></i></div>
+        <div><div class="text-xs text-gray-500">ביקורת חדשה</div><div>5 כוכבים · גוגל</div></div>
+      </div>
+      <div class="badge-float float3 top-1/2 left-0">
+        <div class="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center"><i class="ti ti-heart text-pink-600"></i></div>
+        <div><div class="text-xs text-gray-500">חבר חדש במועדון</div><div>שירה כהן</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 text-gray-400 scroll-cue text-sm flex flex-col items-center gap-2">
+    <span>גלילה</span>
+    <i class="ti ti-chevron-down text-2xl"></i>
+  </div>
+</section>
+
+<section class="bg-[#0F0F1E] text-white py-6">
+  <div class="marquee-wrap" dir="ltr">
+    <div class="marquee-track text-2xl font-black">
+      <div class="marquee-group">
+        <span>🍕 פיצריות</span><span>·</span><span>🥩 מסעדות שף</span><span>·</span>
+        <span>☕ בתי קפה</span><span>·</span><span>🍣 סושי בארים</span><span>·</span>
+        <span>🍔 רשתות מזון</span><span>·</span><span>🍷 ברים ומועדונים</span><span>·</span>
+        <span>🥗 דליברי וטייק-אווי</span><span>·</span><span>🥘 חומוסיות</span><span>·</span>
+        <span>🍰 קונדיטוריות</span><span>·</span><span>🌮 מסעדות אתניות</span><span>·</span>
+      </div>
+      <div class="marquee-group" aria-hidden="true">
+        <span>🍕 פיצריות</span><span>·</span><span>🥩 מסעדות שף</span><span>·</span>
+        <span>☕ בתי קפה</span><span>·</span><span>🍣 סושי בארים</span><span>·</span>
+        <span>🍔 רשתות מזון</span><span>·</span><span>🍷 ברים ומועדונים</span><span>·</span>
+        <span>🥗 דליברי וטייק-אווי</span><span>·</span><span>🥘 חומוסיות</span><span>·</span>
+        <span>🍰 קונדיטוריות</span><span>·</span><span>🌮 מסעדות אתניות</span><span>·</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-20 md:py-32 bg-[#0F0F1E] text-white relative overflow-hidden" id="demo">
+  <div class="blob" style="background:#FF5722;width:420px;height:420px;top:-100px;right:-120px;opacity:.3"></div>
+  <div class="blob" style="background:#FF006E;width:360px;height:360px;bottom:-80px;left:-100px;opacity:.25"></div>
+  <div class="dotted-bg absolute inset-0 opacity-20"></div>
+
+  <div class="relative max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+    <div>
+      <div class="reveal-up inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 px-4 py-2 rounded-full text-sm font-bold mb-5">
+        <i class="ti ti-player-play-filled text-[#FF5722]"></i>
+        הדגמה חיה
+      </div>
+      <h2 class="reveal-up font-display text-4xl md:text-6xl mb-6">
+        ככה זה נראה<br>
+        <span class="gradient-text">בפועל.</span>
+      </h2>
+      <p class="reveal-up text-lg md:text-xl text-gray-300 mb-8 leading-relaxed">
+        תפריט דיגיטלי שעובד באמת — מהיר, מקצועי, ובעברית מלאה. ככה הלקוח שלכם רואה את המסעדה כשהוא סורק את הברקוד על השולחן.
+      </p>
+      <div class="reveal-up space-y-4 mb-10">
+        <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF5722] to-[#FF006E] flex items-center justify-center text-white shadow-lg shadow-orange-500/30 flex-shrink-0"><i class="ti ti-bolt"></i></div><span class="text-gray-200">טעינה בפחות משנייה</span></div>
+        <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF5722] to-[#FF006E] flex items-center justify-center text-white shadow-lg shadow-orange-500/30 flex-shrink-0"><i class="ti ti-hand-finger"></i></div><span class="text-gray-200">חוויית גלילה חלקה כמו אפליקציה</span></div>
+        <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF5722] to-[#FF006E] flex items-center justify-center text-white shadow-lg shadow-orange-500/30 flex-shrink-0"><i class="ti ti-sparkles"></i></div><span class="text-gray-200">עיצוב מקצועי שמייצר תיאבון</span></div>
+      </div>
+      <a href="https://wa.me/972501234567?text=%D7%94%D7%99%D7%99%2C%20%D7%A8%D7%95%D7%A6%D7%94%20%D7%93%D7%9E%D7%95%20%D7%A9%D7%9C%20Vino" target="_blank" class="btn-whatsapp">
+        <i class="ti ti-brand-whatsapp text-2xl"></i>
+        בקשו דמו אצלכם
+      </a>
+    </div>
+
+    <div class="reveal-scale flex justify-center" id="phone-container">
+      <div class="video-showcase-wrap">
+        <div class="video-glow"></div>
+        <div class="video-showcase">
+          <div class="video-corner-label"><span class="live-dot"></span>הדגמה חיה</div>
+          <video autoplay muted loop playsinline preload="auto" id="vino-demo-video">
+            <source src="Vino%202%20V2.mp4" type="video/mp4">
+          </video>
+          <div class="video-placeholder" id="video-placeholder">
+            <i class="ti ti-video"></i>
+            <p>טוען סרטון...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-20 md:py-28 relative">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-14 reveal-up">
+      <div class="inline-block bg-red-100 text-red-700 px-4 py-1.5 rounded-full text-sm font-bold mb-4">תכירו? 👇</div>
+      <h2 class="font-display text-4xl md:text-5xl mb-4">אתם משלמים על 5 מערכות שעובדות <span class="text-red-500">חצי</span></h2>
+      <p class="text-lg text-gray-600">ובסוף החודש מבינים שאף אחת מהן לא באמת מדברת עם השנייה.</p>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="reveal-up bg-white rounded-3xl p-6 border-2 border-red-100 hover:border-red-300 transition"><div class="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mb-4"><i class="ti ti-file-x text-red-500 text-3xl"></i></div><h3 class="font-bold text-lg mb-2">תפריט ב-PDF משנת 2019</h3><p class="text-sm text-gray-600">לקוחות מנסים לזום על הטלפון, לא רואים מחירים מעודכנים, ומזמינים מנות שכבר ירדו.</p></div>
+      <div class="reveal-up bg-white rounded-3xl p-6 border-2 border-red-100 hover:border-red-300 transition"><div class="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mb-4"><i class="ti ti-message-off text-red-500 text-3xl"></i></div><h3 class="font-bold text-lg mb-2">הזמנות שמתפספסות בוואטסאפ</h3><p class="text-sm text-gray-600">אין מערכת. הכל ידני. וכל לקוח שנופל = ₪200 שלא נכנסו.</p></div>
+      <div class="reveal-up bg-white rounded-3xl p-6 border-2 border-red-100 hover:border-red-300 transition"><div class="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mb-4"><i class="ti ti-users-minus text-red-500 text-3xl"></i></div><h3 class="font-bold text-lg mb-2">אפס נתונים על הלקוחות</h3><p class="text-sm text-gray-600">לא יודעים מי קונה, מה הם אוהבים, מתי יש להם יום הולדת. אפס מועדון.</p></div>
+      <div class="reveal-up bg-white rounded-3xl p-6 border-2 border-red-100 hover:border-red-300 transition"><div class="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mb-4"><i class="ti ti-star-off text-red-500 text-3xl"></i></div><h3 class="font-bold text-lg mb-2">ביקורות שלא נאספות</h3><p class="text-sm text-gray-600">לקוח מרוצה שותק. לקוח מאוכזב כותב. הדירוג בגוגל יורד ולא יודעים למה.</p></div>
+    </div>
+    <div class="text-center mt-14 reveal-up"><div class="inline-block bg-gradient-to-r from-[#FF5722] to-[#FF006E] text-white px-6 py-3 rounded-full font-bold text-lg">✨ יש דרך אחרת. היא נקראת Vino.</div></div>
+  </div>
+</section>
+
+<section id="modules" class="py-20 md:py-28 bg-[#0F0F1E] text-white relative overflow-hidden">
+  <div class="blob" style="background:#FF5722;width:500px;height:500px;top:-150px;right:-150px;opacity:.25"></div>
+  <div class="blob" style="background:#FF006E;width:400px;height:400px;bottom:-100px;left:-100px;opacity:.2"></div>
+  <div class="dotted-bg absolute inset-0 opacity-30"></div>
+  <div class="relative max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16 reveal-up">
+      <div class="inline-block bg-white/10 backdrop-blur border border-white/20 px-4 py-1.5 rounded-full text-sm font-bold mb-4">15 מודולים · מערכת אחת</div>
+      <h2 class="font-display text-4xl md:text-6xl mb-4">כל מה שהמסעדה<br>שלכם <span class="gradient-text">צריכה.</span></h2>
+      <p class="text-lg text-gray-300 max-w-2xl mx-auto">כל מודול נבנה במיוחד עבור מסעדנים — לא טיוטה גנרית של "SaaS אמריקאי". עברית, RTL, ובלי שום מתכנת.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#FF5722] to-[#FF006E] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF5722] to-[#FF006E] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-layout-dashboard text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">לוח בקרה</h3><p class="text-sm text-gray-300">תמונת מצב חיה — הזמנות, הכנסות, מגמות, ביצועי מנות. החלטות מבוססות דאטה.</p></div>
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#FFB627] to-[#FF5722] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FFB627] to-[#FF5722] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-edit text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">עורך תפריט</h3><p class="text-sm text-gray-300">עריכה חיה — מנות, מחירים, תמונות, תיאורים. שינוי בקליק — נראה ללקוח בו במקום.</p></div>
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#06B6A4] to-[#0EA5E9] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#06B6A4] to-[#0EA5E9] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-language text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">תרגומים</h3><p class="text-sm text-gray-300">תפריט רב-לשוני בקליק. תיירים, דוברי אנגלית, ערבית, רוסית — כולם בבית.</p></div>
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#FF006E] to-[#A855F7] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF006E] to-[#A855F7] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-clock text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">לוח זמנים</h3><p class="text-sm text-gray-300">תפריטי בוקר/צהריים/ערב, מנות עונתיות, שעות פעילות — מתחלפים אוטומטית.</p></div>
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#FF5722] to-[#FFB627] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF5722] to-[#FFB627] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-shopping-cart text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">הזמנות וקופה</h3><p class="text-sm text-gray-300 mb-3">ניהול הזמנות שולחן/איסוף/משלוח, חיבור ישיר לקופה ולמדפסות במטבח. הזמנה ← הדפסה ← הכנה. אפס פספוסים.</p><div class="inline-flex items-center gap-1.5 bg-green-500/15 border border-green-400/30 text-green-300 text-xs font-bold px-2.5 py-1 rounded-full"><i class="ti ti-shield-check"></i>מסוף פרטי · הכסף ישירות למסעדה</div></div>
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#A855F7] to-[#FF006E] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#A855F7] to-[#FF006E] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-bell text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">שירות</h3><p class="text-sm text-gray-300">קריאה למלצר, בקשת חשבון, הזמנה נוספת — ישירות מהטלפון של הלקוח.</p></div>
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#FF006E] to-[#FFB627] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF006E] to-[#FFB627] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-palette text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">עיצוב</h3><p class="text-sm text-gray-300">התאמת התפריט ל-DNA של המותג שלכם — צבעים, פונטים, לוגו. בלי מעצב.</p></div>
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#0EA5E9] to-[#A855F7] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0EA5E9] to-[#A855F7] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-home text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">דף נחיתה</h3><p class="text-sm text-gray-300">דף הבית של המסעדה — תפריט, ביקורות, רשתות, וואטסאפ, ניווט. הכל בקישור אחד.</p></div>
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#FF006E] to-[#06B6A4] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF006E] to-[#06B6A4] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-sparkles text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">פופאפים</h3><p class="text-sm text-gray-300">מבצעים והצעות שמופיעים בדיוק ברגע הנכון — לפני שהלקוח יצא.</p></div>
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#A855F7] to-[#0EA5E9] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#A855F7] to-[#0EA5E9] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-users text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">מועדון לקוחות</h3><p class="text-sm text-gray-300">נקודות, הטבות, ימי הולדת ושיווק חוזר. הופך לקוחות חד-פעמיים לקבועים.</p></div>
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#FFB627] to-[#FF006E] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FFB627] to-[#FF006E] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-star text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">ביקורות</h3><p class="text-sm text-gray-300">איסוף אוטומטי לגוגל ולפייסבוק. הדירוג עולה — והעסק מופיע ראשון בחיפוש.</p></div>
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#FF006E] to-[#A855F7] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF006E] to-[#A855F7] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-robot text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">סטודיו AI ✨</h3><p class="text-sm text-gray-300">תיאורי מנות, פוסטים, סטוריז ותמונות — בלחיצת כפתור עם בינה מלאכותית.</p></div>
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#06B6A4] to-[#FFB627] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#06B6A4] to-[#FFB627] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-calendar-event text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">הזמנת שולחנות</h3><p class="text-sm text-gray-300">אישור אוטומטי, ניהול תפוסה ותזכורות SMS — שולחן מלא בכל שעה.</p></div>
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#FF5722] to-[#06B6A4] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF5722] to-[#06B6A4] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-ticket text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">קופונים</h3><p class="text-sm text-gray-300">קודי הנחה, מבצעי 1+1, קופונים מוגבלים בזמן. מכירות בלחיצה.</p></div>
+      <div class="module-card relative bg-white/5 backdrop-blur border border-white/10 rounded-3xl p-6 overflow-hidden reveal-scale"><div class="module-icon-bg absolute -top-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-br from-[#0EA5E9] to-[#FF006E] opacity-20"></div><div class="module-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0EA5E9] to-[#FF006E] flex items-center justify-center mb-4 relative z-10"><i class="ti ti-device-tv text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">תצוגת מסך</h3><p class="text-sm text-gray-300">תפריטים על מסכים בכניסה ומעל הקופה — מתחלפים לפי שעות ומבצעים.</p></div>
+    </div>
+
+    <div class="text-center mt-14 reveal-up">
+      <p class="text-gray-300 mb-6 text-lg">ו... זה אפילו לא הכל. יש פרסום מובנה, היסטוריית פעולות מלאה, ממשק דו-לשוני ועוד.</p>
+      <a href="https://wa.me/972501234567?text=%D7%A8%D7%95%D7%A6%D7%94%20%D7%93%D7%9E%D7%95%20%D7%9E%D7%9C%D7%90" target="_blank" class="btn-whatsapp">
+        <i class="ti ti-brand-whatsapp text-2xl"></i>
+        קבעו דמו מלא של 15 דקות
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="py-20 md:py-28 bg-gradient-to-br from-[#FF5722] via-[#E63946] to-[#FF006E] text-white relative overflow-hidden">
+  <div class="dotted-bg absolute inset-0 opacity-20"></div>
+  <div class="relative max-w-6xl mx-auto px-6">
+    <div class="text-center mb-14 reveal-up">
+      <div class="inline-block bg-white/20 backdrop-blur border border-white/30 px-4 py-1.5 rounded-full text-sm font-bold mb-4">☀️ מסעדות שהשתמשו בקיץ שעבר</div>
+      <h2 class="font-display text-4xl md:text-5xl mb-4">המספרים מדברים בעד עצמם</h2>
+      <p class="text-lg opacity-90">נתונים ממוצעים מהמסעדות שלנו לאחר 3 חודשים במערכת</p>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="text-center reveal-scale"><div class="font-display text-6xl md:text-7xl mb-2" data-count="34">0</div><div class="text-lg opacity-90">% עלייה בהזמנות</div></div>
+      <div class="text-center reveal-scale"><div class="font-display text-6xl md:text-7xl mb-2" data-count="2.8" data-suffix="x">0</div><div class="text-lg opacity-90">יותר ביקורות 5⭐</div></div>
+      <div class="text-center reveal-scale"><div class="font-display text-6xl md:text-7xl mb-2" data-count="71">0</div><div class="text-lg opacity-90">% חברים פעילים במועדון</div></div>
+      <div class="text-center reveal-scale"><div class="font-display text-6xl md:text-7xl mb-2" data-count="18" data-suffix="h">0</div><div class="text-lg opacity-90">שעות ניהול נחסכות בשבוע</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="py-20 md:py-28">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-16 reveal-up">
+      <div class="inline-block bg-orange-100 text-orange-700 px-4 py-1.5 rounded-full text-sm font-bold mb-4">איך זה עובד</div>
+      <h2 class="font-display text-4xl md:text-5xl mb-4">3 שלבים. <span class="gradient-text">יומיים.</span> אונליין.</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-8 relative">
+      <div class="absolute top-12 right-[16%] left-[16%] dashed-line hidden md:block"></div>
+      <div class="reveal-up text-center relative"><div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#FF5722] to-[#FF006E] flex items-center justify-center text-white font-black text-4xl shadow-2xl shadow-orange-500/40 relative z-10">1</div><h3 class="font-bold text-2xl mb-3">שיחת היכרות</h3><p class="text-gray-600">15 דקות בוואטסאפ. אנחנו מבינים את העסק שלכם, מציגים את המערכת, ומתחילים.</p></div>
+      <div class="reveal-up text-center relative"><div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#FFB627] to-[#FF5722] flex items-center justify-center text-white font-black text-4xl shadow-2xl shadow-orange-500/40 relative z-10">2</div><h3 class="font-bold text-2xl mb-3">הקמה תוך 48 שעות</h3><p class="text-gray-600">אנחנו מעלים את התפריט, מעצבים, מחברים קופה ומדפסות — והכל מוכן לפעולה.</p></div>
+      <div class="reveal-up text-center relative"><div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#FF006E] to-[#A855F7] flex items-center justify-center text-white font-black text-4xl shadow-2xl shadow-pink-500/40 relative z-10">3</div><h3 class="font-bold text-2xl mb-3">קיץ ☀️ מלא הזמנות</h3><p class="text-gray-600">נכנסים לעונה החמה ביותר עם מערכת שעובדת — ויותר זמן לדברים שחשובים באמת.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="py-20 md:py-24 bg-gradient-to-br from-[#FFF8F0] via-[#FFEFD9] to-[#FFE0C2] relative overflow-hidden">
+  <div class="blob float" style="background:#FFB627;width:300px;height:300px;top:-80px;right:10%;opacity:.3"></div>
+  <div class="blob float2" style="background:#FF5722;width:240px;height:240px;bottom:-60px;left:5%;opacity:.2"></div>
+  <div class="relative max-w-6xl mx-auto px-6">
+    <div class="text-center mb-12 reveal-up">
+      <div class="inline-block bg-white border-2 border-orange-300 text-[#FF5722] px-4 py-1.5 rounded-full text-sm font-bold mb-4">🤝 השירות הוא לפני הכל</div>
+      <h2 class="font-display text-4xl md:text-5xl mb-4">אצלנו עונים <span class="gradient-text">אנשים אמיתיים.</span></h2>
+      <p class="text-lg text-gray-700 max-w-2xl mx-auto">לא בוט. לא תור של 40 דקות. לא "צוות התמיכה יחזור אליך". <strong>תרימו, נענה.</strong></p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-5 mb-10">
+      <div class="reveal-up bg-white rounded-3xl p-6 border-2 border-orange-100 shadow-lg shadow-orange-500/5"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center mb-4"><i class="ti ti-clock-hour-8 text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">08:00 – 00:00</h3><p class="text-gray-600">16 שעות ביום של זמינות מלאה. גם בשישי בלילה כשהבר מלא — אנחנו פה.</p></div>
+      <div class="reveal-up bg-white rounded-3xl p-6 border-2 border-orange-100 shadow-lg shadow-orange-500/5"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mb-4"><i class="ti ti-brand-whatsapp text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">וואטסאפ + טלפון</h3><p class="text-gray-600">תכתבו או תתקשרו — איך שנוח לכם. בכל מקרה מקבלים את אותו השירות.</p></div>
+      <div class="reveal-up bg-white rounded-3xl p-6 border-2 border-orange-100 shadow-lg shadow-orange-500/5"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF5722] to-[#FF006E] flex items-center justify-center mb-4"><i class="ti ti-calendar-week text-white text-3xl"></i></div><h3 class="font-bold text-xl mb-2">ימים א' – ו'</h3><p class="text-gray-600">לאורך כל השבוע, גם בערבי שישי כשאתם הכי עמוסים. תמיכה ישראלית 100%.</p></div>
+    </div>
+    <div class="text-center reveal-up">
+      <p class="text-2xl font-black text-[#FF5722] mb-4">נסו אותנו 😊</p>
+      <a href="https://wa.me/972501234567?text=%D7%94%D7%99%D7%99%2C%20%D7%A8%D7%95%D7%A6%D7%94%20%D7%9C%D7%93%D7%91%D7%A8%20%D7%A2%D7%9C%20Vino" target="_blank" class="btn-whatsapp">
+        <i class="ti ti-brand-whatsapp text-2xl"></i>
+        תכתבו לנו עכשיו
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="proof" class="py-20 md:py-28 bg-white">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-14 reveal-up">
+      <div class="inline-block bg-yellow-100 text-yellow-800 px-4 py-1.5 rounded-full text-sm font-bold mb-4">💬 מסעדנים מדברים</div>
+      <h2 class="font-display text-4xl md:text-5xl mb-4">"זה הדבר הכי טוב שעשינו<br>למסעדה <span class="gradient-text">השנה"</span></h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="reveal-up bg-[#FFF8F0] rounded-3xl p-6 border border-orange-100"><div class="flex gap-1 mb-4 text-yellow-400 text-xl">★★★★★</div><p class="text-gray-800 mb-5 leading-relaxed">"תוך חודש קיבלנו 47 ביקורות חמש כוכבים בגוגל. עברנו ממסעדה ה-12 בעיר ל-3. ה-ROI כיסה את עצמו בשבועיים."</p><div class="flex items-center gap-3"><div class="w-12 h-12 rounded-full bg-gradient-to-br from-[#FF5722] to-[#FF006E] flex items-center justify-center text-white font-bold">ר.כ</div><div><div class="font-bold">רון כהן</div><div class="text-xs text-gray-500">בעלים, פיצה הקרון · ראשון לציון</div></div></div></div>
+      <div class="reveal-up bg-[#FFF8F0] rounded-3xl p-6 border border-orange-100"><div class="flex gap-1 mb-4 text-yellow-400 text-xl">★★★★★</div><p class="text-gray-800 mb-5 leading-relaxed">"הוצאנו 3 מערכות מהשירות. עכשיו הכל ב-Vino. חוסכים ₪1,200 בחודש על תוכנות, וזה לפני שמדברים על העלייה במכירות."</p><div class="flex items-center gap-3"><div class="w-12 h-12 rounded-full bg-gradient-to-br from-[#FFB627] to-[#FF5722] flex items-center justify-center text-white font-bold">ש.ל</div><div><div class="font-bold">שירה לוי</div><div class="text-xs text-gray-500">מנהלת רשת, Burger Lab · 4 סניפים</div></div></div></div>
+      <div class="reveal-up bg-[#FFF8F0] rounded-3xl p-6 border border-orange-100"><div class="flex gap-1 mb-4 text-yellow-400 text-xl">★★★★★</div><p class="text-gray-800 mb-5 leading-relaxed">"סטודיו ה-AI כותב לי את הפוסטים לאינסטגרם בשניות. חסכתי מעצב חיצוני שעלה לי ₪2,500 בחודש. שווה את זה רק בשביל זה."</p><div class="flex items-center gap-3"><div class="w-12 h-12 rounded-full bg-gradient-to-br from-[#FF006E] to-[#A855F7] flex items-center justify-center text-white font-bold">ע.מ</div><div><div class="font-bold">עמית מזרחי</div><div class="text-xs text-gray-500">שף בעלים, Sushi Roll · תל אביב</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="py-20 md:py-28 bg-[#FFF8F0]">
+  <div class="max-w-3xl mx-auto px-6">
+    <div class="text-center mb-12 reveal-up">
+      <div class="inline-block bg-orange-100 text-orange-700 px-4 py-1.5 rounded-full text-sm font-bold mb-4">שאלות נפוצות</div>
+      <h2 class="font-display text-4xl md:text-5xl">קצר ולעניין.</h2>
+    </div>
+    <div class="space-y-3">
+      <details class="reveal-up bg-white rounded-2xl border border-orange-100 group"><summary class="flex justify-between items-center p-5 font-bold text-lg"><span>מה כלול במחיר?</span><i class="ti ti-chevron-down chev text-2xl text-[#FF5722]"></i></summary><div class="px-5 pb-5 text-gray-700 leading-relaxed">כל 15 המודולים, ללא יוצא מן הכלל. אין "תוספות בתשלום", אין שדרוגים נסתרים. מחיר חודשי קבוע, ביטול בכל עת.</div></details>
+      <details class="reveal-up bg-white rounded-2xl border border-orange-100 group"><summary class="flex justify-between items-center p-5 font-bold text-lg"><span>כמה זמן לוקח להקים את המערכת?</span><i class="ti ti-chevron-down chev text-2xl text-[#FF5722]"></i></summary><div class="px-5 pb-5 text-gray-700 leading-relaxed">48 שעות. אנחנו מעלים את התפריט, מעצבים בעיצוב המותג שלכם, מחברים קופה ומדפסות — ואתם באוויר.</div></details>
+      <details class="reveal-up bg-white rounded-2xl border border-orange-100 group"><summary class="flex justify-between items-center p-5 font-bold text-lg"><span>מה אם יש לי כבר תפריט דיגיטלי אחר?</span><i class="ti ti-chevron-down chev text-2xl text-[#FF5722]"></i></summary><div class="px-5 pb-5 text-gray-700 leading-relaxed">אנחנו מעבירים את כל התוכן עבורכם — מנות, תמונות, מחירים — ללא עלות. ההגירה היא חלק מהשירות.</div></details>
+      <details class="reveal-up bg-white rounded-2xl border border-orange-100 group"><summary class="flex justify-between items-center p-5 font-bold text-lg"><span>האם המערכת מתחברת לקופה שלי?</span><i class="ti ti-chevron-down chev text-2xl text-[#FF5722]"></i></summary><div class="px-5 pb-5 text-gray-700 leading-relaxed">יש אפשרות — למערכת שלנו יש חיבורי API להכל. עם זאת, אנחנו פחות ממליצים על המסלול הזה כי הוא כרוך בעלויות נוספות. <strong>הפתרון שלנו: מסוף סליקה פרטי עם חיבור ישיר למדפסות שלנו</strong> — פשוט, יעיל, והכסף מגיע ישירות אליכם בלי עמלות מתווכים.</div></details>
+      <details class="reveal-up bg-white rounded-2xl border border-orange-100 group"><summary class="flex justify-between items-center p-5 font-bold text-lg"><span>אם זה לא יעבוד לי?</span><i class="ti ti-chevron-down chev text-2xl text-[#FF5722]"></i></summary><div class="px-5 pb-5 text-gray-700 leading-relaxed">אצלנו <strong>השירות הוא לפני הכל</strong> — תבדקו אותנו. מענה אנושי זמין משעות <strong>08:00–00:00</strong> בוואטסאפ ובטלפון, ימים א'–ו'. נסו אותנו 😊</div></details>
+    </div>
+  </div>
+</section>
+
+<section class="py-20 md:py-28 bg-[#0F0F1E] text-white relative overflow-hidden">
+  <div class="blob float" style="background:#FF5722;width:400px;height:400px;top:-100px;right:-100px;opacity:.4"></div>
+  <div class="blob float2" style="background:#FF006E;width:350px;height:350px;bottom:-100px;left:-100px;opacity:.4"></div>
+  <div class="relative max-w-4xl mx-auto px-6 text-center">
+    <div class="reveal-up inline-block bg-gradient-to-r from-yellow-400/20 to-orange-500/20 backdrop-blur border border-yellow-300/40 px-5 py-2 rounded-full text-sm font-bold mb-6">☀️ מתכוננים לקיץ · הצעה מוקדמת</div>
+    <h2 class="reveal-up font-display text-5xl md:text-7xl mb-6">קיץ 2026 מתחיל. <br><span class="gradient-text">תהיו מוכנים.</span></h2>
+    <p class="reveal-up text-xl md:text-2xl text-gray-300 mb-10 leading-relaxed">בואו נדבר 15 דקות. נראה אם זה מתאים לכם.<br>אין מצגות שיווקיות, אין לחץ — רק שיחה.</p>
+    <div class="reveal-up flex flex-wrap justify-center gap-4 mb-8">
+      <a href="https://wa.me/972501234567?text=%D7%94%D7%99%D7%99%2C%20%D7%A8%D7%95%D7%A6%D7%94%20%D7%9C%D7%94%D7%AA%D7%9B%D7%95%D7%A0%D7%9F%20%D7%9C%D7%A7%D7%99%D7%A5%202026%20%D7%A2%D7%9D%20Vino" target="_blank" class="btn-whatsapp" style="font-size:20px;padding:20px 36px">
+        <i class="ti ti-brand-whatsapp text-3xl"></i>
+        תפסו מקום לקיץ 2026
+      </a>
+    </div>
+    <p class="reveal-up text-sm text-gray-400">או חייגו ישירות: <a href="tel:+972501234567" class="text-white font-bold hover:text-[#FFB627]">050-123-4567</a> · <span class="text-yellow-300">זמינים 08:00–00:00 · א'–ו'</span></p>
+  </div>
+</section>
+
+<footer class="bg-[#0A0A14] text-gray-400 py-12">
+  <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-8">
+    <div>
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FF5722] to-[#FF006E] flex items-center justify-center text-white font-black">V</div>
+        <div><div class="font-black text-white">Vino</div><div class="text-xs">ניהול מסעדות</div></div>
+      </div>
+      <p class="text-sm leading-relaxed">מערכת ניהול חכמה למסעדות. עברית, מקצועית, אנושית.</p>
+    </div>
+    <div><h4 class="font-bold text-white mb-3">מוצר</h4><ul class="space-y-2 text-sm"><li><a href="#modules" class="hover:text-[#FF5722]">מודולים</a></li><li><a href="#how" class="hover:text-[#FF5722]">איך זה עובד</a></li><li><a href="#proof" class="hover:text-[#FF5722]">לקוחות</a></li><li><a href="#faq" class="hover:text-[#FF5722]">שאלות נפוצות</a></li></ul></div>
+    <div><h4 class="font-bold text-white mb-3">עקבו אחרינו</h4><div class="flex gap-3"><a href="#" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/15 flex items-center justify-center"><i class="ti ti-brand-facebook"></i></a><a href="#" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/15 flex items-center justify-center"><i class="ti ti-brand-instagram"></i></a><a href="#" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/15 flex items-center justify-center"><i class="ti ti-brand-tiktok"></i></a><a href="#" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/15 flex items-center justify-center"><i class="ti ti-brand-linkedin"></i></a></div></div>
+    <div><h4 class="font-bold text-white mb-3">צרו קשר</h4><ul class="space-y-2 text-sm"><li><i class="ti ti-brand-whatsapp ml-2"></i>050-123-4567</li><li><i class="ti ti-mail ml-2"></i>hello@vino.co.il</li><li><i class="ti ti-map-pin ml-2"></i>תל אביב, ישראל</li></ul></div>
+  </div>
+  <div class="max-w-7xl mx-auto px-6 mt-10 pt-6 border-t border-white/10 text-center text-xs">© 2026 Vino. כל הזכויות שמורות.</div>
+</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+const isTouch = window.matchMedia('(hover:none)').matches;
+const isMobile = window.matchMedia('(max-width: 768px)').matches;
+const isSmallMobile = window.matchMedia('(max-width: 380px)').matches;
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+gsap.utils.toArray('.reveal-up').forEach(el => gsap.to(el, { opacity:1, y:0, duration:.9, ease:'power3.out', scrollTrigger:{trigger:el, start:'top 88%'} }));
+gsap.utils.toArray('.reveal-scale').forEach(el => gsap.to(el, { opacity:1, scale:1, duration:.8, ease:'back.out(1.4)', scrollTrigger:{trigger:el, start:'top 88%'} }));
+gsap.utils.toArray('.reveal-left, .reveal-right').forEach(el => gsap.to(el, { opacity:1, x:0, duration:.9, ease:'power3.out', scrollTrigger:{trigger:el, start:'top 88%'} }));
+
+ScrollTrigger.create({ trigger:'#modules', start:'top 70%', once:true, onEnter:()=>{ gsap.fromTo('.module-card',{opacity:0,y:30,scale:.92},{opacity:1,y:0,scale:1,duration:.55,ease:'back.out(1.3)',stagger:.05}); } });
+
+document.querySelectorAll('[data-count]').forEach(el => {
+  const target = parseFloat(el.dataset.count);
+  const suffix = el.dataset.suffix || '';
+  ScrollTrigger.create({ trigger:el, start:'top 80%', once:true, onEnter:()=>{ const obj = {val:0}; gsap.to(obj,{val:target,duration:2,ease:'power2.out',onUpdate:()=>{ el.textContent = (target%1===0?Math.round(obj.val):obj.val.toFixed(1))+suffix; }}); } });
+});
+const heroCounter = document.getElementById('hero-counter1');
+if (heroCounter) gsap.to({v:0},{v:247,duration:2,ease:'power2.out',delay:1.6,onUpdate:function(){heroCounter.textContent=Math.round(this.targets()[0].v);}});
+
+gsap.to('.blob.float',{y:-30,duration:6,repeat:-1,yoyo:true,ease:'sine.inOut'});
+
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const href = a.getAttribute('href');
+    if (href === '#') return;
+    const target = document.querySelector(href);
+    if (target) { e.preventDefault(); target.scrollIntoView({behavior:'smooth',block:'start'}); }
+  });
+});
+
+const heroH1 = document.getElementById('hero-h1');
+if (heroH1 && !reducedMotion) {
+  const original = Array.from(heroH1.childNodes);
+  heroH1.innerHTML = '';
+  original.forEach(node => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const words = node.textContent.split(/(\s+)/);
+      words.forEach(word => {
+        if (word.trim()) {
+          const span = document.createElement('span');
+          span.className = 'split-word';
+          span.textContent = word;
+          heroH1.appendChild(span);
+        } else {
+          heroH1.appendChild(document.createTextNode(word));
+        }
+      });
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      if (node.tagName === 'BR') { heroH1.appendChild(node); }
+      else { node.classList.add('split-word'); heroH1.appendChild(node); }
+    }
+  });
+  gsap.to('#hero-h1 .split-word', { opacity:1, y:0, rotateZ:0, duration:.85, ease:'back.out(1.6)', stagger:.07, delay:.25 });
+}
+
+const cards = document.querySelectorAll('.module-card');
+if (!isTouch && !reducedMotion) {
+  cards.forEach(card => {
+    const setRX = gsap.quickTo(card, 'rotateX', {duration:.5, ease:'power3.out'});
+    const setRY = gsap.quickTo(card, 'rotateY', {duration:.5, ease:'power3.out'});
+    let isHover = false;
+    card.addEventListener('mouseenter', () => { isHover = true; gsap.to(card, {y:-6, scale:1.02, duration:.4, ease:'power3.out'}); });
+    card.addEventListener('mousemove', (e) => {
+      if (!isHover) return;
+      const rect = card.getBoundingClientRect();
+      const rotateX = ((e.clientY - rect.top) / rect.height - .5) * -10;
+      const rotateY = ((e.clientX - rect.left) / rect.width - .5) * 10;
+      setRX(rotateX); setRY(rotateY);
+    });
+    card.addEventListener('mouseleave', () => { isHover = false; gsap.to(card, {y:0, scale:1, rotateX:0, rotateY:0, duration:.6, ease:'power3.out'}); });
+  });
+} else if (!reducedMotion) {
+  cards.forEach(card => {
+    card.addEventListener('touchstart', () => { gsap.to(card, {scale:.97, rotateX:-4, duration:.18, ease:'power2.out'}); }, {passive:true});
+    const reset = () => gsap.to(card, {scale:1, rotateX:0, duration:.55, ease:'elastic.out(1, .5)'});
+    card.addEventListener('touchend', reset, {passive:true});
+    card.addEventListener('touchcancel', reset, {passive:true});
+  });
+}
+
+if (!reducedMotion) {
+  gsap.to(document.body, { backgroundColor: '#FFE5BC', ease: 'none', scrollTrigger: { trigger:'body', start:'top top', end:'bottom bottom', scrub:1.2 } });
+}
+
+const hamburger = document.querySelector('.hamburger');
+const mobileMenu = document.getElementById('mobile-menu');
+if (hamburger && mobileMenu) {
+  const closeBtn = mobileMenu.querySelector('.close-btn');
+  const openMenu = () => { mobileMenu.classList.add('open'); document.body.style.overflow = 'hidden'; };
+  const closeMenu = () => { mobileMenu.classList.remove('open'); document.body.style.overflow = ''; };
+  hamburger.addEventListener('click', openMenu);
+  closeBtn.addEventListener('click', closeMenu);
+  mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && mobileMenu.classList.contains('open')) closeMenu(); });
+}
+
+const phoneContainer = document.getElementById('phone-container');
+if (phoneContainer && !reducedMotion) {
+  gsap.fromTo(phoneContainer, { y: 40, rotate: 2 }, { y: -40, rotate: -2, ease: 'none', scrollTrigger: { trigger: '#demo', start: 'top bottom', end: 'bottom top', scrub: 1.2 } });
+}
+
+const vinoVideo = document.getElementById('vino-demo-video');
+const videoPlaceholder = document.getElementById('video-placeholder');
+if (vinoVideo && videoPlaceholder) {
+  vinoVideo.muted = true;
+  vinoVideo.loop = true;
+  vinoVideo.playsInline = true;
+  vinoVideo.addEventListener('playing', () => { videoPlaceholder.style.display = 'none'; });
+  vinoVideo.addEventListener('loadeddata', () => { videoPlaceholder.style.display = 'none'; vinoVideo.play().catch(()=>{}); });
+  vinoVideo.addEventListener('error', () => { videoPlaceholder.style.display = 'flex'; });
+  // Bulletproof loop — if the native loop fails, restart manually
+  vinoVideo.addEventListener('ended', () => { vinoVideo.currentTime = 0; vinoVideo.play().catch(()=>{}); });
+  // Periodic check — if video is paused for any reason, restart it
+  setInterval(() => {
+    if (vinoVideo.paused && vinoVideo.readyState >= 2) { vinoVideo.play().catch(()=>{}); }
+  }, 2000);
+}
+
+window.addEventListener('orientationchange', () => setTimeout(() => ScrollTrigger.refresh(), 200));
+window.addEventListener('resize', () => ScrollTrigger.refresh());
+
+// ============================================
+//   LANGUAGE TOGGLE — Hebrew / English
+// ============================================
+const I18N = {
+  'ניהול מסעדות':'Restaurant Management','המודולים':'Modules','איך זה עובד':'How It Works','לקוחות':'Customers','שאלות':'FAQ','שאלות נפוצות':'FAQ','דברו איתנו':'Contact Us',
+  'מענה אנושי בקיץ הזה':'Human support this summer',
+  '☀️ מתכוננים לקיץ · עונת השיא מתחילה':'☀️ Get ready for summer · Peak season starts',
+  '15 מודולים מקצועיים':'15 professional modules',
+  'שמחליפים את כל המערכות שאתם משלמים עליהן היום. מתפריט דיגיטלי, דרך מועדון לקוחות, ועד AI שכותב לכם את התוכן השיווקי.':'that replace all the systems you\'re paying for today. From digital menus, to loyalty clubs, to AI that writes your marketing content.',
+  '🌴 קיץ 2026 כבר כאן — אל תכנסו לעונה לא מוכנים.':'🌴 Summer 2026 is here — don\'t enter the season unprepared.',
+  'תפסו מקום לקיץ 2026':'Reserve Your Spot for Summer 2026','ראו את כל המודולים':'See all modules','גלילה':'Scroll',
+  'מוכנים לקיץ':'Summer-ready','תוך 48 שעות':'in 48 hours','מענה אנושי 08:00–00:00':'Human support 8:00–24:00','וואטסאפ + טלפון':'WhatsApp + Phone',
+  'פאנל ניהול':'Admin Panel','שלום, שף 👋':'Hello, Chef 👋','הזמנות היום':'Orders today','▲ 18% מאתמול':'▲ 18% vs yesterday','הכנסות':'Revenue','לקוחות חדשים':'New customers','גרף השעה האחרונה':'Last hour','חי':'Live','הזמנות':'Orders','מועדון':'Club','ביקורות':'Reviews','הזמנה חדשה':'New order','שולחן 4 · ₪148':'Table 4 · ₪148','ביקורת חדשה':'New review','5 כוכבים · גוגל':'5 stars · Google','חבר חדש במועדון':'New club member','שירה כהן':'Shira Cohen',
+  '🍕 פיצריות':'🍕 Pizzerias','🥩 מסעדות שף':'🥩 Chef Restaurants','☕ בתי קפה':'☕ Cafes','🍣 סושי בארים':'🍣 Sushi Bars','🍔 רשתות מזון':'🍔 Food Chains','🍷 ברים ומועדונים':'🍷 Bars & Clubs','🥗 דליברי וטייק-אווי':'🥗 Delivery & Takeout','🥘 חומוסיות':'🥘 Hummus Joints','🍰 קונדיטוריות':'🍰 Patisseries','🌮 מסעדות אתניות':'🌮 Ethnic Cuisine',
+  'הדגמה חיה':'Live Demo',
+  'תפריט דיגיטלי שעובד באמת — מהיר, מקצועי, ובעברית מלאה. ככה הלקוח שלכם רואה את המסעדה כשהוא סורק את הברקוד על השולחן.':'A digital menu that actually works — fast, professional, fully localized. This is what your customer sees when they scan the QR code on the table.',
+  'טעינה בפחות משנייה':'Loads in under a second','חוויית גלילה חלקה כמו אפליקציה':'Smooth scrolling like a native app','עיצוב מקצועי שמייצר תיאבון':'Professional design that drives appetite','בקשו דמו אצלכם':'Request a demo','טוען סרטון...':'Loading video...',
+  'תכירו? 👇':'Sound familiar? 👇','חצי':'halfway',
+  'ובסוף החודש מבינים שאף אחת מהן לא באמת מדברת עם השנייה.':'And by month\'s end, none of them actually talk to each other.',
+  'תפריט ב-PDF משנת 2019':'PDF menu from 2019',
+  'לקוחות מנסים לזום על הטלפון, לא רואים מחירים מעודכנים, ומזמינים מנות שכבר ירדו.':'Customers zoom on their phones, see outdated prices, and order discontinued dishes.',
+  'הזמנות שמתפספסות בוואטסאפ':'Orders lost in WhatsApp',
+  'אין מערכת. הכל ידני. וכל לקוח שנופל = ₪200 שלא נכנסו.':'No system. All manual. Every lost customer = ₪200 you didn\'t earn.',
+  'אפס נתונים על הלקוחות':'Zero customer data',
+  'לא יודעים מי קונה, מה הם אוהבים, מתי יש להם יום הולדת. אפס מועדון.':'You don\'t know who buys, what they like, or when their birthday is. Zero loyalty.',
+  'ביקורות שלא נאספות':'Reviews never collected',
+  'לקוח מרוצה שותק. לקוח מאוכזב כותב. הדירוג בגוגל יורד ולא יודעים למה.':'Happy customers stay silent. Disappointed ones write. Google rating drops, and you don\'t know why.',
+  '✨ יש דרך אחרת. היא נקראת Vino.':'✨ There\'s another way. It\'s called Vino.',
+  '15 מודולים · מערכת אחת':'15 Modules · One System',
+  'כל מודול נבנה במיוחד עבור מסעדנים — לא טיוטה גנרית של "SaaS אמריקאי". עברית, RTL, ובלי שום מתכנת.':'Every module built specifically for restaurateurs — not a generic "American SaaS" template. Multi-language, no developer required.',
+  'לוח בקרה':'Dashboard',
+  'תמונת מצב חיה — הזמנות, הכנסות, מגמות, ביצועי מנות. החלטות מבוססות דאטה.':'Live snapshot — orders, revenue, trends, dish performance. Data-driven decisions.',
+  'עורך תפריט':'Menu Editor',
+  'עריכה חיה — מנות, מחירים, תמונות, תיאורים. שינוי בקליק — נראה ללקוח בו במקום.':'Live editing — dishes, prices, photos, descriptions. Change in one click — visible to customers instantly.',
+  'תרגומים':'Translations',
+  'תפריט רב-לשוני בקליק. תיירים, דוברי אנגלית, ערבית, רוסית — כולם בבית.':'Multi-language menu in one click. Tourists, English/Arabic/Russian speakers — all welcome.',
+  'לוח זמנים':'Schedule',
+  'תפריטי בוקר/צהריים/ערב, מנות עונתיות, שעות פעילות — מתחלפים אוטומטית.':'Breakfast/lunch/dinner menus, seasonal dishes, operating hours — switch automatically.',
+  'הזמנות וקופה':'Orders & POS',
+  'ניהול הזמנות שולחן/איסוף/משלוח, חיבור ישיר לקופה ולמדפסות במטבח. הזמנה ← הדפסה ← הכנה. אפס פספוסים.':'Dine-in/takeout/delivery order management, direct POS and kitchen printer integration. Order → Print → Prepare. Zero misses.',
+  'מסוף פרטי · הכסף ישירות למסעדה':'Private terminal · Money goes directly to you',
+  'שירות':'Service',
+  'קריאה למלצר, בקשת חשבון, הזמנה נוספת — ישירות מהטלפון של הלקוח.':'Call waiter, request bill, place additional order — directly from customer\'s phone.',
+  'עיצוב':'Design',
+  'התאמת התפריט ל-DNA של המותג שלכם — צבעים, פונטים, לוגו. בלי מעצב.':'Match the menu to your brand DNA — colors, fonts, logo. No designer needed.',
+  'דף נחיתה':'Landing Page',
+  'דף הבית של המסעדה — תפריט, ביקורות, רשתות, וואטסאפ, ניווט. הכל בקישור אחד.':'Restaurant home page — menu, reviews, socials, WhatsApp, directions. All in one link.',
+  'פופאפים':'Popups',
+  'מבצעים והצעות שמופיעים בדיוק ברגע הנכון — לפני שהלקוח יצא.':'Promotions and offers at exactly the right moment — before the customer leaves.',
+  'מועדון לקוחות':'Loyalty Club',
+  'נקודות, הטבות, ימי הולדת ושיווק חוזר. הופך לקוחות חד-פעמיים לקבועים.':'Points, perks, birthdays and remarketing. Turn one-timers into regulars.',
+  'איסוף אוטומטי לגוגל ולפייסבוק. הדירוג עולה — והעסק מופיע ראשון בחיפוש.':'Automatic collection for Google and Facebook. Rating climbs — business appears first in search.',
+  'סטודיו AI ✨':'AI Studio ✨',
+  'תיאורי מנות, פוסטים, סטוריז ותמונות — בלחיצת כפתור עם בינה מלאכותית.':'Dish descriptions, posts, stories and images — one click with AI.',
+  'הזמנת שולחנות':'Table Reservations',
+  'אישור אוטומטי, ניהול תפוסה ותזכורות SMS — שולחן מלא בכל שעה.':'Automatic confirmation, capacity management, SMS reminders — full tables every hour.',
+  'קופונים':'Coupons',
+  'קודי הנחה, מבצעי 1+1, קופונים מוגבלים בזמן. מכירות בלחיצה.':'Discount codes, BOGO deals, time-limited coupons. Sales in one click.',
+  'תצוגת מסך':'Screen Display',
+  'תפריטים על מסכים בכניסה ומעל הקופה — מתחלפים לפי שעות ומבצעים.':'Menus on screens at entrance and counter — switch by time and promotions.',
+  'ו... זה אפילו לא הכל. יש פרסום מובנה, היסטוריית פעולות מלאה, ממשק דו-לשוני ועוד.':'And... that\'s not even all. There\'s built-in advertising, complete action history, bilingual interface and more.',
+  'קבעו דמו מלא של 15 דקות':'Schedule a full 15-min demo',
+  '☀️ מסעדות שהשתמשו בקיץ שעבר':'☀️ Restaurants that used Vino last summer',
+  'המספרים מדברים בעד עצמם':'The numbers speak for themselves',
+  'נתונים ממוצעים מהמסעדות שלנו לאחר 3 חודשים במערכת':'Average data from our restaurants after 3 months in the system',
+  '% עלייה בהזמנות':'% increase in orders','יותר ביקורות 5⭐':'more 5⭐ reviews','% חברים פעילים במועדון':'% active loyalty members','שעות ניהול נחסכות בשבוע':'mgmt hours saved per week',
+  'יומיים.':'Two days.','אונליין.':'All online.',
+  'שיחת היכרות':'Intro call',
+  '15 דקות בוואטסאפ. אנחנו מבינים את העסק שלכם, מציגים את המערכת, ומתחילים.':'15 minutes on WhatsApp. We learn your business, show the system, and get started.',
+  'הקמה תוך 48 שעות':'Setup in 48 hours',
+  'אנחנו מעלים את התפריט, מעצבים, מחברים קופה ומדפסות — והכל מוכן לפעולה.':'We upload the menu, design it, connect POS and printers — everything\'s ready to go.',
+  'קיץ ☀️ מלא הזמנות':'Summer ☀️ full of orders',
+  'נכנסים לעונה החמה ביותר עם מערכת שעובדת — ויותר זמן לדברים שחשובים באמת.':'Enter the hottest season with a system that works — and more time for what really matters.',
+  '🤝 השירות הוא לפני הכל':'🤝 Service comes first',
+  '08:00 – 00:00':'8:00 – 24:00',
+  '16 שעות ביום של זמינות מלאה. גם בשישי בלילה כשהבר מלא — אנחנו פה.':'16 hours a day of full availability. Even Friday night when the bar\'s packed — we\'re here.',
+  'תכתבו או תתקשרו — איך שנוח לכם. בכל מקרה מקבלים את אותו השירות.':'Text or call — whichever works for you. Same great service either way.',
+  'ימים א\' – ו\'':'Sun – Fri',
+  'לאורך כל השבוע, גם בערבי שישי כשאתם הכי עמוסים. תמיכה ישראלית 100%.':'Throughout the week, including Friday evenings when you\'re busiest. 100% local support.',
+  'נסו אותנו 😊':'Try us 😊','תכתבו לנו עכשיו':'Message us now',
+  '💬 מסעדנים מדברים':'💬 Restaurateurs speaking',
+  'רון כהן':'Ron Cohen','בעלים, פיצה הקרון · ראשון לציון':'Owner, Pizza HaKaron · Rishon LeZion',
+  'שירה לוי':'Shira Levy','מנהלת רשת, Burger Lab · 4 סניפים':'Chain Manager, Burger Lab · 4 locations',
+  'עמית מזרחי':'Amit Mizrahi','שף בעלים, Sushi Roll · תל אביב':'Chef-Owner, Sushi Roll · Tel Aviv',
+  'קצר ולעניין.':'Short and sweet.','מה כלול במחיר?':'What\'s included in the price?',
+  'כל 15 המודולים, ללא יוצא מן הכלל. אין "תוספות בתשלום", אין שדרוגים נסתרים. מחיר חודשי קבוע, ביטול בכל עת.':'All 15 modules, no exceptions. No "paid add-ons", no hidden upgrades. Fixed monthly price, cancel anytime.',
+  'כמה זמן לוקח להקים את המערכת?':'How long does setup take?',
+  '48 שעות. אנחנו מעלים את התפריט, מעצבים בעיצוב המותג שלכם, מחברים קופה ומדפסות — ואתם באוויר.':'48 hours. We upload the menu, design with your brand, connect POS and printers — you\'re live.',
+  'מה אם יש לי כבר תפריט דיגיטלי אחר?':'What if I already have another digital menu?',
+  'אנחנו מעבירים את כל התוכן עבורכם — מנות, תמונות, מחירים — ללא עלות. ההגירה היא חלק מהשירות.':'We migrate all your content — dishes, photos, prices — at no cost. Migration is part of the service.',
+  'האם המערכת מתחברת לקופה שלי?':'Does the system connect to my POS?',
+  'אם זה לא יעבוד לי?':'What if it doesn\'t work for me?',
+  '☀️ מתכוננים לקיץ · הצעה מוקדמת':'☀️ Get ready for summer · Early offer',
+  'בואו נדבר 15 דקות. נראה אם זה מתאים לכם.':'Let\'s talk for 15 minutes. We\'ll see if it\'s a fit.',
+  'אין מצגות שיווקיות, אין לחץ — רק שיחה.':'No sales pitch, no pressure — just a conversation.',
+  'או חייגו ישירות:':'Or call directly:','זמינים 08:00–00:00 · א\'–ו\'':'Available 8:00–24:00 · Sun–Fri',
+  'מערכת ניהול חכמה למסעדות. עברית, מקצועית, אנושית.':'Smart restaurant management system. Local, professional, human.',
+  'מוצר':'Product','עקבו אחרינו':'Follow us','צרו קשר':'Contact','תל אביב, ישראל':'Tel Aviv, Israel',
+  '© 2026 Vino. כל הזכויות שמורות.':'© 2026 Vino. All rights reserved.',
+  // Additional missing translations
+  '3 שלבים.':'3 steps.',
+  'ככה זה נראה':'This is how it','בפועל.':'actually works.',
+  'אתם משלמים על 5 מערכות שעובדות':'You\'re paying for 5 systems that work',
+  'כל מה שהמסעדה':'Everything your','שלכם':'restaurant','צריכה.':'needs.',
+  'אצלנו עונים':'Real','אנשים אמיתיים.':'humans answer.',
+  'לא בוט. לא תור של 40 דקות. לא "צוות התמיכה יחזור אליך".':'Not a bot. Not a 40-minute queue. Not "support will get back to you".',
+  'תרימו, נענה.':'Call us, we answer.',
+  '"זה הדבר הכי טוב שעשינו':'"The best thing we did',
+  'למסעדה':'for the restaurant','השנה"':'this year"',
+  'קיץ 2026 מתחיל.':'Summer 2026 starts.','תהיו מוכנים.':'Be ready.',
+  '"תוך חודש קיבלנו 47 ביקורות חמש כוכבים בגוגל. עברנו ממסעדה ה-12 בעיר ל-3. ה-ROI כיסה את עצמו בשבועיים."':'"Within a month we got 47 five-star Google reviews. Moved from #12 in the city to #3. ROI paid for itself in two weeks."',
+  '"הוצאנו 3 מערכות מהשירות. עכשיו הכל ב-Vino. חוסכים ₪1,200 בחודש על תוכנות, וזה לפני שמדברים על העלייה במכירות."':'"We dropped 3 systems. Now everything\'s on Vino. Saving ₪1,200/month on software, before even mentioning the sales increase."',
+  '"סטודיו ה-AI כותב לי את הפוסטים לאינסטגרם בשניות. חסכתי מעצב חיצוני שעלה לי ₪2,500 בחודש. שווה את זה רק בשביל זה."':'"AI Studio writes my Instagram posts in seconds. Saved an external designer that cost ₪2,500/month. Worth it for that alone."',
+};
+
+// Complex elements that need full innerHTML replacement (have inline HTML / structure)
+const I18N_HTML = {
+  he: {},
+  en: {
+    'hero-h1': 'Your entire restaurant.<br><span class="gradient-text">In one system.</span><br><span class="squiggle">Done right.</span>'
+  }
+};
+
+const heI18nBackup = {
+  'hero-h1': 'כל המסעדה שלך.<br><span class="gradient-text">במערכת אחת.</span><br><span class="squiggle">בעברית.</span>'
+};
+
+const _i18nNodeBackup = new Map();
+let _currentLang = 'he';
+
+function _walkTextNodes(node, cb) {
+  if (node.nodeType === 3) { cb(node); return; }
+  if (node.nodeType !== 1) return;
+  if (node.tagName === 'SCRIPT' || node.tagName === 'STYLE') return;
+  for (let i = 0; i < node.childNodes.length; i++) _walkTextNodes(node.childNodes[i], cb);
+}
+
+function applyEnglish() {
+  // Restore H1 first (it was split into spans) then translate via innerHTML
+  const h1 = document.getElementById('hero-h1');
+  if (h1) {
+    if (!h1.dataset.heBackup) h1.dataset.heBackup = heI18nBackup['hero-h1'];
+    h1.innerHTML = I18N_HTML.en['hero-h1'];
+  }
+  // Walk all other text nodes
+  _walkTextNodes(document.body, node => {
+    if (h1 && h1.contains(node)) return;
+    const trimmed = node.textContent.trim();
+    if (trimmed && I18N[trimmed]) {
+      if (!_i18nNodeBackup.has(node)) _i18nNodeBackup.set(node, node.textContent);
+      const leading = node.textContent.match(/^\s*/)[0];
+      const trailing = node.textContent.match(/\s*$/)[0];
+      node.textContent = leading + I18N[trimmed] + trailing;
+    }
+  });
+  document.querySelectorAll('.lang-toggle').forEach(b => b.textContent = 'עב');
+  document.documentElement.lang = 'en';
+  _currentLang = 'en';
+  try { localStorage.setItem('vino-lang', 'en'); } catch(e){}
+}
+
+function applyHebrew() {
+  const h1 = document.getElementById('hero-h1');
+  if (h1 && h1.dataset.heBackup) h1.innerHTML = h1.dataset.heBackup;
+  _i18nNodeBackup.forEach((original, node) => {
+    if (node && node.parentNode) node.textContent = original;
+  });
+  _i18nNodeBackup.clear();
+  document.querySelectorAll('.lang-toggle').forEach(b => b.textContent = 'EN');
+  document.documentElement.lang = 'he';
+  _currentLang = 'he';
+  try { localStorage.setItem('vino-lang', 'he'); } catch(e){}
+}
+
+function toggleLanguage() {
+  if (_currentLang === 'he') applyEnglish();
+  else applyHebrew();
+}
+
+// Restore saved language preference (apply after intro animations complete)
+try {
+  const saved = localStorage.getItem('vino-lang');
+  if (saved === 'en') setTimeout(applyEnglish, 1600);
+} catch(e){}
+</script>
+
+</body>
+</html>
